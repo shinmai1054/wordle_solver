@@ -28,10 +28,14 @@ void searchOptimalSolution() {
                 used_char[c - 'a'] = true;
             }
         }
+
+        int MO_size = MO.size();
+
         #ifdef _OPENMP
         #pragma omp parallel for
         #endif
-        for (auto word: MO) {
+        for (int w = 0; w < MO_size; ++w) {
+            std::string word = MO[w];
             bool not_used = true;
             for(char c : word) {
                 if(c - 'a' >= 26) std::exit(2);
