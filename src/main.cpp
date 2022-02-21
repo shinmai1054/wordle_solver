@@ -1,5 +1,4 @@
 // main.cpp
-#include "search.hpp"
 #include "solve.hpp"
 
 #ifdef _OPENMP
