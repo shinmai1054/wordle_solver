@@ -2,29 +2,24 @@
 #include "search.hpp"
 #include "solve.hpp"
 
+#ifdef _OPENMP
+    #include <omp.h>
+#endif
 
-int main() {
-    //solve();
-    searchOptimalSolution();
-    return 0;
-}
+int main(int argc, char* argv[]) {
+    #ifdef _OPENMP
+    std::cout << "OpenMP : Enabled (Max # of threads = " << omp_get_max_threads() << ")" << std::endl;
+    #else
+    std::cout << "OpenMP : Disabled" << std::endl;
+    #endif
 
-
-int main2() {
-    std::vector<std::string> Ma, MO;
-    read_file(Ma, MO);
-    char green[5], orange[5];
-    std::vector<char> gray;
-    std::string s;
-    while (true) {
-        std::cin >> s;
-        dist(s, "array", green, orange, gray);
-        for(int i = 0; i < 5; ++i) std::cout << green[i] << std::endl;
-        std::cout << std::endl;
-        for(int i = 0; i < 5; ++i) std::cout << orange[i] << std::endl;
-        std::cout << std::endl;
-        for(auto b: gray) std::cout << b << std::endl;
-        std::cout << std::endl;
+    if(argc == 2){
+        if(std::string(argv[1]) == "--solution") {
+            searchOptimalSolution();
+            return 0;
+        }
     }
+
+    solve("roate");
     return 0;
 }

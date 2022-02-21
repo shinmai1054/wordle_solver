@@ -5,12 +5,9 @@
 #include <vector>
 #include <climits>
 
-#ifdef _OPENMP
-    #include <omp.h>
-#endif
 
 #include "wordleio.hpp"
 #include "search.hpp"
 
-extern void solve();
+extern void solve(std::string default_word);
 extern void searchOptimalSolution();

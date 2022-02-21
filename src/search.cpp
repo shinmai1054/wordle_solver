@@ -80,7 +80,7 @@ void cand(char green[5], char orange[5], std::vector<char> gray, std::vector<std
     candidates = new_cands;
 }
 
-std::string search(std::vector<std::string> candidates, std::vector<std::string> MO, bool blacklist[26]) {
+std::string search(std::vector<std::string> candidates, std::vector<std::string> MO, bool blacklist[26], std::vector<std::string> input_words) {
     // search
     std::string iw_min = "";
     int cand_min = INT_MAX;
@@ -88,9 +88,10 @@ std::string search(std::vector<std::string> candidates, std::vector<std::string>
     int MO_size = MO.size();
 
     #ifdef _OPENMP
-    //#pragma omp parallel for
+    #pragma omp parallel for
     #endif
-    for(auto word: MO) {
+    for(int i = 0; i < MO_size; i++) {
+        std::string word = MO[i];
         ++count;
         bool not_used = true;
         for(char c : word) {
@@ -105,27 +106,40 @@ std::string search(std::vector<std::string> candidates, std::vector<std::string>
         char green[5], orange[5];
         std::vector<char> gray;
         std::vector<std::string> nextcandidates;
+        std::vector<std::string> words(input_words);
+        words.push_back(word);
         for (auto ans: candidates) {
+            if(word == ans) {
+                ++cand_sum;
+                continue;
+            }
             nextcandidates = candidates;
-            dist(word, ans, green, orange, gray);
-            cand(green, orange, gray, nextcandidates);
+            for (auto iw: words) {
+                dist(iw, ans, green, orange, gray);
+                cand(green, orange, gray, nextcandidates);
+            }
             cand_sum += nextcandidates.size();
         }
+        // print
         #ifdef _OPENMP
-        //#pragma omp critical
+        #pragma omp critical
         #endif
         {
-        std::cout << "\r" << count << " / " << MO_size;
-        std::flush(std::cout);
-        if (cand_sum < cand_min) {
-            iw_min = word;
-            cand_min = cand_sum;
-            std::cout << "\r" << count << " / " << MO_size << ", average: " << cand_sum / double(candidates.size()) << ", word: " << word << std::endl;
-        }
+            std::cout << "\r" << count << " / " << MO_size;
+            std::flush(std::cout);
+            if (cand_sum < cand_min) {
+                iw_min = word;
+                cand_min = cand_sum;
+                std::cout << "\r" << count << " / " << MO_size << ", average: " << cand_sum / double(candidates.size()) << ", word: " << word << std::endl;
+            }
         }
     }
-    if(iw_min == "") iw_min = candidates[0];
 
     std::cout << std::endl;
     return iw_min;
+}
+
+std::string search(std::vector<std::string> candidates, std::vector<std::string> MO, bool blacklist[26]) {
+    std::vector<std::string> input_words;
+    return search(candidates, MO, blacklist, input_words);
 }
